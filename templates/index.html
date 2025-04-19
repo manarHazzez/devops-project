@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Application Météo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .weather-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        .weather-icon {
+            width: 100px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="weather-box">
+        <h2>🌤️ Application Météo</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <input type="text" name="city" class="form-control" placeholder="Entrer le nom de la ville" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Afficher la météo</button>
+        </form>
+
+        {% if error %}
+            <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+
+        {% if weather %}
+            <div class="mt-4">
+                <h3>{{ weather.city }} <img src="https://flagsapi.com/{{ weather.country }}/flat/32.png" alt="{{ weather.country }}"></h3>
+                <img src="http://openweathermap.org/img/wn/{{ weather.icon }}@2x.png" class="weather-icon" alt="icon météo">
+                <p><strong>{{ weather.temperature }}°C</strong></p>
+                <p>{{ weather.description }}</p>
+                <p>💧 Humidité : {{ weather.humidity }}%</p>
+                <p>💨 Vent : {{ weather.wind_speed }} m/s</p>
+                <p>⏰ Heure locale : {{ weather.local_time }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if weather %}
+        <div id="map" style="height: 400px;"></div>
+		
+		
+        <script>
+            var map = L.map('map').setView([{{ weather.lat }}, {{ weather.lon }}], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            L.marker([{{ weather.lat }}, {{ weather.lon }}]).addTo(map)
+                .bindPopup('<b>{{ weather.city }}</b><br />{{ weather.temperature }}°C')
+                .openPopup();
+        </script>
+    {% endif %}
+
+</body>
+</html>
