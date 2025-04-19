@@ -1,0 +1,26 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main  # Déclenche le pipeline lors d'un push sur la branche principale
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Utilise un environnement Ubuntu pour l'exécution du job
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Récupère le code du repo
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1  # Configure Docker Buildx pour la construction
+
+      - name: Build Docker image
+        run: docker build -t myapp .  # Crée l'image Docker
+
+      - name: Deploy Docker container
+        run: |
+          docker stop myapp || true   # Arrêter le container s'il existe
+          docker rm myapp || true     # Supprimer le container existant
+          docker run -d -p 5000:5000 --name myapp myapp  # Déployer le nouveau container
