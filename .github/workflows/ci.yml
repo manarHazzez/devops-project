@@ -1,0 +1,20 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main  # ou "master" selon ton nom de branche
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Cloner le dépôt
+      uses: actions/checkout@v3
+
+    - name: 🐳 Construire l'image Docker
+      run: docker build -t myweatherapp .
+
+    - name: ✅ Vérifier que l'image existe
+      run: docker images
