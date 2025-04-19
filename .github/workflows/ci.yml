@@ -3,31 +3,37 @@ name: Docker Build and Push
 on:
   push:
     branches:
-      - main
+      - main  # Déclenchement sur le push vers la branche main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Utilisation de la dernière version d'Ubuntu pour exécuter le job
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Mise à jour vers la version v3
+        uses: actions/checkout@v3  # Action pour récupérer le code du dépôt
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      
+        uses: docker/setup-buildx-action@v1  # Action pour configurer Docker Buildx
+
       - name: Cache Docker layers
-        uses: actions/cache@v3  # Mise à jour vers la version v3
+        uses: actions/cache@v3  # Mise en cache des couches Docker pour accélérer les builds
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
-      
+
       - name: Build Docker image
-        run: docker build -t myweatherapp .
-        working-directory: ${{ github.workspace }}
-      
+        run: docker build -t myweatherapp .  # Construction de l'image Docker
+        working-directory: ${{ github.workspace }}  # Définit le répertoire de travail comme l'espace de travail GitHub
+
       - name: Push Docker image
-        run: docker push myweatherapp
-        # Ajoute l'authentification Docker si nécessaire
+        run: docker push myweatherapp  # Pousse l'image Docker vers le registre Docker (e.g., Docker Hub ou GitHub Container Registry)
+        # Si tu utilises Docker Hub ou un autre registre privé, tu peux ajouter un step d'authentification comme ci-dessous :
+        # env:
+        #   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        #   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        # run: |
+        #   echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+        #   docker push myweatherapp
