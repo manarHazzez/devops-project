@@ -11,23 +11,25 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Mise à jour vers la version v3
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
       
       - name: Cache Docker layers
-        uses: actions/cache@v3  # Mise à jour vers la version v3
+        uses: actions/cache@v3
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-buildx-
       
+      - name: List files for debugging
+        run: ls -alh
+
       - name: Build Docker image
-        run: docker build -t myweatherapp -f Dockerfile .
+        run: docker build -t myweatherapp -f ${{ github.workspace }}/Dockerfile .
         working-directory: ${{ github.workspace }}
       
       - name: Push Docker image
         run: docker push myweatherapp
-        # Ajoute l'authentification Docker si nécessaire
